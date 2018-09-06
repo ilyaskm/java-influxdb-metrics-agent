@@ -41,7 +41,7 @@ public class JvmAgentService {
 			final List<InfluxDB> conns = new ArrayList<>(config.servers.size());
 			for (final HostAndPort server : config.servers) {
 				try {
-					final InfluxDB conn = InfluxDBFactory.connect("http://" + server, config.user, config.password);
+					final InfluxDB conn = InfluxDBFactory.connect((config.ssl ? "https://" : "http://") + server, config.user, config.password);
 					conns.add(conn);
 				} catch (Exception e) {
 					LOG.warn("Failed to connect to InfluxDB server {}.", server, e);

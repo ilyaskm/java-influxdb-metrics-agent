@@ -25,6 +25,7 @@ public class JvmAgentConfig {
 	public static final String DEFAULT_LOG_LEVEL = "INFO";
 
 	public List<HostAndPort> servers;
+	public boolean ssl;
 	public int interval;
 	public String database;
 	public String user;
@@ -53,6 +54,11 @@ public class JvmAgentConfig {
 			return val == null ? defval : Integer.parseInt(val);
 		}
 
+		public boolean getBoolean(final String key, final boolean defval) {
+			final String val = values.get(key);
+			return val == null ? defval : Boolean.parseBoolean(val);
+		}
+		
 		public String getString(final String key, final String defval) {
 			return values.getOrDefault(key, defval);
 		}
@@ -97,10 +103,13 @@ public class JvmAgentConfig {
 				.map(server -> HostAndPort.fromString(server).withDefaultPort(DEFAULT_PORT))
 				.collect(Collectors.toList());
 
+		final boolean ssl = context.getBoolean("ssl", false);
+
 		final int interval = context.getInteger("interval", DEFAULT_INTERVAL);
 		if (interval <= 0)
 			throw new ConfigurationException("interval must be positive.");
 
+		
 		final String database = context.getString("database");
 		if (Strings.isNullOrEmpty(database))
 			throw new ConfigurationException("database must not be null or empty.");
@@ -119,6 +128,7 @@ public class JvmAgentConfig {
 
 		final JvmAgentConfig config = new JvmAgentConfig();
 		config.servers = hostAndPorts;
+		config.ssl = ssl;
 		config.interval = interval;
 		config.database = database;
 		config.user = user;
